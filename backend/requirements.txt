@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+scapy
+geoip2
+pydantic-settings
