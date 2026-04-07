@@ -58,11 +58,6 @@ sudo -E .venv/bin/uvicorn backend.app.main:app --app-dir . --host 0.0.0.0 --port
 
 The frontend is served as static files by the backend. Open `http://localhost:8000` in your browser.
 
-For Vercel preview deployments (frontend only):
-```bash
-npx vercel dev
-```
-
 ## Making Changes
 
 1. Create a feature branch from `main`:
