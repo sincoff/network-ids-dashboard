@@ -46,7 +46,6 @@ htmlcov/
 .ruff_cache/
 
 # Vercel
-.vercel/
 
 # OS
 .DS_Store

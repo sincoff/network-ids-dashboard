@@ -3,7 +3,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-00a393.svg)](https://fastapi.tiangolo.com)
-[![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000.svg)](https://vercel.com)
 
 **NetShield IDS** is an open-source, real-time visual intrusion detection tool built for Linux environments. It monitors incoming network traffic in real-time, detecting volumetric attacks such as DDoS floods, and dynamically plots the geographic origins of the attacks on an interactive, live web-based map.
 
@@ -29,7 +28,7 @@ NetShield IDS follows a decoupled frontend/backend architecture designed for sec
 1. **Python Packet Sniffer**: Runs with escalated privileges (`CAP_NET_RAW`) on the target Ubuntu VM, inspecting packets on a specified network interface.
 2. **Detection Engine**: Analyzes traffic windows and flags thresholds.
 3. **FastAPI Backend**: Serves the REST API for historical data and a WebSocket endpoint for live streaming.
-4. **Vercel / Static Frontend**: The dashboard UI can be hosted remotely on a CDN like Vercel or locally via Nginx. It connects to the VM's backend to render the data.
+4. **Local Dashboard Interface**: The static dashboard UI is served rapidly through the Nginx reverse proxy securely on the same VM and utilizes Websockets to communicate with the Python backend.
 
 For detailed diagrams and data flows, see the [Architecture Documentation](docs/ARCHITECTURE.md).
 
@@ -91,11 +90,6 @@ NetShield IDS provides full documentation and scripts to deploy the system in a 
 Use the included setup script to install dependencies, configure a Python virtual environment, set up a Systemd service, and implement an Nginx reverse proxy.
 See [Deployment Guide: Ubuntu 24.04 LTS](docs/DEPLOYMENT.md#ubuntu-2404-lts-virtual-machine)
 
-### 2. Vercel Frontend Hosting (Optional)
-The dashboard UI can be hosted globally on Vercel's Free Tier, while connecting back to your Ubuntu VM's IP or Domain for the actual packet sniffing data.
-See [Deployment Guide: Vercel Hosting](docs/DEPLOYMENT.md#vercel-hosting-frontend)
-
----
 
 ## 🧪 DDoS Simulation
 

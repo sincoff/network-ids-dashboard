@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **REST API** — Status, health check, recent events, and statistics endpoints.
 - **WebSocket API** — Live event broadcasting to connected dashboard clients.
 - **DDoS simulation scripts** — `hping3`-based SYN and UDP flood generators for controlled lab testing.
-- **Vercel frontend deployment** — Static dashboard hosted on Vercel free tier.
+
 - **Ubuntu 24.04 LTS production deployment** — Systemd service, Nginx reverse proxy, UFW firewall configuration.
 - **Comprehensive documentation** — Architecture guide, API reference, deployment manual, and contributing guidelines.
 - **CI/CD pipeline** — GitHub Actions for linting, type-checking, and automated deployment.

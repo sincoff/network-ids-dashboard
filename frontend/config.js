@@ -1,22 +1,14 @@
 /**
- * Network IDS Dashboard — Runtime Configuration
+ * NetShield IDS — Runtime Configuration
  *
- * When hosted on Vercel (frontend-only), set VITE_BACKEND_URL to
- * the VM's public address. When served by the Python backend directly,
- * the default same-origin config works automatically.
- *
- * Usage in Vercel:
- *   Set the environment variable VITE_BACKEND_URL in Vercel project settings
- *   e.g. VITE_BACKEND_URL=http://192.168.182.138:8000
+ * The dashboard is designed to be hosted locally within the Ubuntu VM
+ * and served behind the Nginx reverse proxy, seamlessly using the 
+ * underlying same-origin to route API and WebSocket traffic.
  */
 
 const CONFIG = (() => {
-  // Check for injected Vercel environment variable via meta tag
-  const meta = document.querySelector('meta[name="backend-url"]');
-  const backendUrl = meta?.content || "";
-
-  // If no backend URL is configured, use same-origin (local dev / VM direct)
-  const apiBase = backendUrl || window.location.origin;
+  // Use same-origin (served directly by VM's Nginx/FastAPI)
+  const apiBase = window.location.origin;
   const wsProtocol = apiBase.startsWith("https") ? "wss" : "ws";
   const wsBase = apiBase.replace(/^https?/, wsProtocol);
 
