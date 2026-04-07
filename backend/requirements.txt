@@ -1,5 +1,9 @@
-fastapi
-uvicorn[standard]
-scapy
-geoip2
-pydantic-settings
+# ── Network IDS Dashboard — Python Dependencies ──
+# Pinned for reproducible builds. Update with:
+#   pip install --upgrade -r requirements.txt
+
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+scapy==2.6.1
+geoip2==4.8.1
+pydantic-settings==2.8.1

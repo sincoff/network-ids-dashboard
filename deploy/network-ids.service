@@ -1,0 +1,43 @@
+[Unit]
+Description=NetShield IDS — Real-Time Network Intrusion Detection Dashboard
+Documentation=https://github.com/your-org/network-ids-dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/network-ids-dashboard
+Environment=PATH=/opt/network-ids-dashboard/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+EnvironmentFile=/opt/network-ids-dashboard/.env
+
+ExecStart=/opt/network-ids-dashboard/.venv/bin/uvicorn backend.app.main:app \
+    --host 127.0.0.1 \
+    --port 8000 \
+    --workers 1 \
+    --log-level info
+
+Restart=always
+RestartSec=5
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+# ── Security Hardening ───────────────────────────────────────────
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ReadWritePaths=/opt/network-ids-dashboard
+
+# Packet capture requires CAP_NET_RAW
+AmbientCapabilities=CAP_NET_RAW
+CapabilityBoundingSet=CAP_NET_RAW
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=network-ids
+
+[Install]
+WantedBy=multi-user.target

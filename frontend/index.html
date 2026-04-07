@@ -3,36 +3,182 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Network IDS Dashboard</title>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""
-    />
+
+    <!-- SEO -->
+    <title>NetShield IDS — Real-Time Intrusion Detection Dashboard</title>
+    <meta name="description" content="Open-source real-time network intrusion detection system with live attack origin mapping, DDoS flood classification, and geographic threat visualization." />
+    <meta name="keywords" content="IDS, intrusion detection, DDoS, network security, cybersecurity, threat visualization" />
+    <meta name="author" content="Anthony Martino, Ian Sincoff, Tyler Good" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="NetShield IDS — Real-Time Intrusion Detection Dashboard" />
+    <meta property="og:description" content="Monitor network threats in real-time with geographic attack origin mapping and DDoS flood detection." />
+    <meta property="og:type" content="website" />
+
+    <!-- Backend URL (set via Vercel env or leave empty for same-origin) -->
+    <meta name="backend-url" content="" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/assets/favicon.png" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <!-- Dashboard Styles -->
     <link rel="stylesheet" href="/assets/styles.css" />
   </head>
   <body>
-    <header>
-      <h1>Real-Time Intrusion Dashboard</h1>
-      <p id="status">Connecting...</p>
+
+    <!-- ═══ Top Navigation Bar ═══ -->
+    <header id="app-header">
+      <div class="header-left">
+        <div class="logo">
+          <img src="/assets/favicon.png" alt="NetShield" class="logo-icon" />
+          <div class="logo-text">
+            <h1>NetShield <span class="accent">IDS</span></h1>
+            <span class="subtitle">Real-Time Intrusion Detection</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-center">
+        <div class="connection-status" id="connection-status">
+          <span class="status-dot" id="status-dot"></span>
+          <span class="status-text" id="status-text">Connecting…</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="header-meta">
+          <span class="version-badge">v1.0.0</span>
+          <span class="time" id="clock"></span>
+        </div>
+      </div>
     </header>
-    <main>
-      <section class="panel map-panel">
-        <h2>Attack Origin Map</h2>
+
+    <!-- ═══ Stats Bar ═══ -->
+    <section id="stats-bar">
+      <div class="stat-card" id="stat-alerts">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value" id="total-alerts">0</span>
+          <span class="stat-label">Total Alerts</span>
+        </div>
+      </div>
+      <div class="stat-card" id="stat-sources">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value" id="unique-sources">0</span>
+          <span class="stat-label">Unique Sources</span>
+        </div>
+      </div>
+      <div class="stat-card" id="stat-packets">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value" id="total-observations">0</span>
+          <span class="stat-label">Packets Analyzed</span>
+        </div>
+      </div>
+      <div class="stat-card threat-card" id="stat-threat">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value threat-level" id="threat-level">NONE</span>
+          <span class="stat-label">Threat Level</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Main Dashboard ═══ -->
+    <main id="dashboard">
+      <!-- Map Panel -->
+      <section class="panel map-panel" id="map-section">
+        <div class="panel-header">
+          <h2>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="panel-icon">
+              <circle cx="12" cy="10" r="3"/><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 10-16 0c0 3 2.7 7 8 11.7z"/>
+            </svg>
+            Attack Origin Map
+          </h2>
+          <div class="panel-actions">
+            <span class="legend-item"><span class="legend-dot syn"></span>SYN Flood</span>
+            <span class="legend-item"><span class="legend-dot udp"></span>UDP Flood</span>
+            <span class="legend-item"><span class="legend-dot icmp"></span>ICMP Flood</span>
+            <span class="legend-item"><span class="legend-dot vol"></span>Volumetric</span>
+          </div>
+        </div>
         <div id="map"></div>
       </section>
-      <section class="panel feed-panel">
-        <h2>Live Event Feed</h2>
-        <ul id="event-list"></ul>
+
+      <!-- Event Feed Panel -->
+      <section class="panel feed-panel" id="feed-section">
+        <div class="panel-header">
+          <h2>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="panel-icon">
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            </svg>
+            Live Event Feed
+          </h2>
+          <div class="panel-actions">
+            <button class="btn-ghost" id="btn-auto-scroll" title="Toggle auto-scroll">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M12 5v14M5 12l7 7 7-7"/>
+              </svg>
+            </button>
+            <button class="btn-ghost" id="btn-clear-feed" title="Clear feed">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="feed-container">
+          <ul id="event-list"></ul>
+          <div class="feed-empty" id="feed-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <p>Monitoring network traffic…</p>
+            <p class="feed-empty-sub">Alerts will appear here when threats are detected.</p>
+          </div>
+        </div>
       </section>
     </main>
 
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin=""
-    ></script>
+    <!-- ═══ Footer ═══ -->
+    <footer id="app-footer">
+      <span>© 2026 Anthony Martino, Ian Sincoff, Tyler Good — Clemson University CPSC 4240</span>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <span class="footer-sep">·</span>
+      <span>MIT License</span>
+    </footer>
+
+    <!-- ═══ Scripts ═══ -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="/assets/config.js"></script>
     <script src="/assets/main.js"></script>
   </body>
-  </html>
+</html>
