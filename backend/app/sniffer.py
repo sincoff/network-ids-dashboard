@@ -2,8 +2,8 @@ from collections.abc import Callable
 from datetime import UTC, datetime
 from threading import Thread
 
-from scapy.all import IP, TCP, UDP, sniff  # type: ignore[import-untyped]
-from scapy.packet import Packet  # type: ignore[import-untyped]
+from scapy.all import IP, TCP, UDP, sniff  
+from scapy.packet import Packet  
 
 from app.config import settings
 from app.detector import detector, make_observation
@@ -47,8 +47,6 @@ class PacketSnifferService:
                 "prn": handle_packet,
             }
             sniff_interface = settings.sniff_interface.strip().lower()
-            # `any` is not universally supported by scapy/libpcap backends on Ubuntu VMs.
-            # For `auto`/`any`, let scapy use its default interface.
             if sniff_interface not in {"", "auto", "any"}:
                 sniff_kwargs["iface"] = settings.sniff_interface
             sniff(**sniff_kwargs)
